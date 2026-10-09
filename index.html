@@ -142,7 +142,20 @@ const[selectedCalendarDate,setSelectedCalendarDate]=useState('');
  async function loadUser(user){setCurrentUser(user);const{data,error}=await supabase.from('profiles').select('*').eq('id',user.id).single();if(!error)setProfile(data);setLoading(false)}
  async function refreshPublicData(){
    const[settingsRes,portfolioRes]=await Promise.all([supabase.from('settings').select('*').eq('id',1).single(),supabase.from('portfolio').select('*').order('created_at',{ascending:true})]);
-   if(settingsRes.data){setThemeColor(settingsRes.data.theme_color);setPaypalLink(settingsRes.data.paypal_link);setPrices({base:Number(settingsRes.data.base_price),rush:Number(settingsRes.data.rush_price),minia:Number(settingsRes.data.minia_price),sousTitres:Number(settingsRes.data.sous_titres_price)});setRushDeliveryTime(settingsRes.data.rush_delivery_time)}
+if(settingsRes.data){
+  setThemeColor(settingsRes.data.theme_color || '#8B5CF6');
+  setPaypalLink(settingsRes.data.paypal_link || 'paypal.me/Wakzil');
+  setPrices({
+    base:Number(settingsRes.data.base_price ?? 50),
+    rush:Number(settingsRes.data.rush_price ?? 20),
+    minia:Number(settingsRes.data.minia_price ?? 15),
+    sousTitres:Number(settingsRes.data.sous_titres_price ?? 10)
+  });
+  setRushDeliveryTime(settingsRes.data.rush_delivery_time || '48h');
+  if(settingsRes.data.portfolio_description){
+    setPortfolioDescription(settingsRes.data.portfolio_description);
+  }
+}
    if(portfolioRes.data)setPortfolio(portfolioRes.data);
    if(currentUser)await loadTickets();
  }
