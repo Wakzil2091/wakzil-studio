@@ -109,8 +109,21 @@ function AuthScreen({onDone}){
 function App(){
  const[currentUser,setCurrentUser]=useState(null);const[profile,setProfile]=useState(null);const[loading,setLoading]=useState(true);
  const[activeTab,setActiveTab]=useState('portfolio');const[activeTicketId,setActiveTicketId]=useState(null);
- const[themeColor,setThemeColor]=useState('#8B5CF6');const[paypalLink,setPaypalLink]=useState('paypal.me/Wakzil');
- const[prices,setPrices]=useState({base:50,rush:20,minia:15,sousTitres:10});const[rushDeliveryTime,setRushDeliveryTime]=useState('48h');
+const[themeColor,setThemeColor]=useState('#8B5CF6');
+const[paypalLink,setPaypalLink]=useState('paypal.me/Wakzil');
+const[prices,setPrices]=useState({base:50,rush:20,minia:15,sousTitres:10});
+const[rushDeliveryTime,setRushDeliveryTime]=useState('48h');
+
+const[portfolioDescription,setPortfolioDescription]=useState(
+  'Du montage gaming rythmé aux formats courts, chaque vidéo est pensée pour capter l’attention, raconter quelque chose et garder le meilleur du contenu.'
+);
+const[bookingDate,setBookingDate]=useState('');
+const[bookingTime,setBookingTime]=useState('');
+const[bookings,setBookings]=useState([]);
+const[calendarMonth,setCalendarMonth]=useState(
+  ()=>new Date(new Date().getFullYear(),new Date().getMonth(),1)
+);
+const[selectedCalendarDate,setSelectedCalendarDate]=useState('');
  const[portfolio,setPortfolio]=useState([]);const[tickets,setTickets]=useState([]);const[activeTicket,setActiveTicket]=useState(null);const[msgInput,setMsgInput]=useState('');const[memberInput,setMemberInput]=useState('');
  const[orderError,setOrderError]=useState('');const[adminTab,setAdminTab]=useState('parametres');const[notice,setNotice]=useState('');
  const[newVideo,setNewVideo]=useState({url:'',title:'',category:'Mes vidéos',priceBase:50});const[videoError,setVideoError]=useState('');const[thumbPreview,setThumbPreview]=useState('');
