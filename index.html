@@ -117,7 +117,7 @@ function App(){
  const[orderDraft,setOrderDraft]=useState({style:null,clientName:'',discordOrEmail:'',brief:'',link:'',options:{rush:false,minia:false,sousTitres:false}});
 
  const role=profile?.role||'client';
- const allPortfolio=portfolio;
+ const allPortfolio=portfolio.filter(item => item.is_custom === true);
 
  useEffect(()=>{
    let alive=true;
