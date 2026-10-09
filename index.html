@@ -1,230 +1,387 @@
-
 <!doctype html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wakzil Studio</title>
+  <title>Wakzil Studio — Montage vidéo</title>
+  <meta name="theme-color" content="#0b0d12" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root{color-scheme:dark;--page:#090a0d;--panel:#111318;--panel-2:#171a21;--line:rgba(255,255,255,.09);--muted:#9ca3af}
-    html,body,#root{min-height:100%;margin:0}*{box-sizing:border-box}
-    body{background:var(--page);color:#f7f7f8;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.012em}
-    body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 15% -15%,rgba(139,92,246,.15),transparent 42%),radial-gradient(ellipse at 95% 15%,rgba(59,130,246,.08),transparent 34%)}
-    ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:#0b0c10}::-webkit-scrollbar-thumb{background:#30343e;border-radius:999px}
-    .site-shell{background:transparent;min-height:100vh}.site-header{position:sticky;top:0;z-index:50;background:rgba(9,10,13,.82);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-bottom:1px solid var(--line)}
-    .header-inner{max-width:1500px;margin:0 auto;padding:14px clamp(18px,4vw,56px);display:flex;align-items:center;justify-content:space-between;gap:28px;min-height:82px}
-    .brand-button{display:flex;align-items:center;gap:12px;min-width:max-content;text-align:left;background:none;border:0;color:inherit;cursor:pointer;padding:0}
-    .brand-mark{width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.13);border-radius:14px;background:linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.025));box-shadow:inset 0 1px rgba(255,255,255,.12)}
-    .brand-name{display:block;font-size:19px;font-weight:850;letter-spacing:-.055em;line-height:1.1}.brand-subtitle{display:block;margin-top:5px;font-size:9px;line-height:1;color:#858b98;font-weight:700;letter-spacing:.19em}
-    .top-nav{display:flex;align-items:center;justify-content:center;gap:5px;padding:5px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035)}
-    .top-nav-link{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 16px;border:1px solid transparent;border-radius:11px;background:transparent;color:#9ca3af;font-size:13px;font-weight:650;white-space:nowrap;transition:all .2s ease;cursor:pointer}
-    .top-nav-link:hover{color:white;background:rgba(255,255,255,.055)}.top-nav-link.is-active{color:white;background:rgba(255,255,255,.085);border-color:rgba(255,255,255,.09);box-shadow:0 5px 18px rgba(0,0,0,.16)}.top-nav-link.is-active:before{content:"";position:absolute;left:13px;right:13px;bottom:-6px;height:2px;border-radius:9px;background:var(--accent,#8b5cf6)}
-    .header-account{display:flex;align-items:center;justify-content:flex-end;gap:12px;min-width:max-content}.account-avatar{width:36px;height:36px;display:grid;place-items:center;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid var(--line);font-size:12px;font-weight:800}.account-copy{max-width:180px}.account-name{font-size:12px;font-weight:750;max-width:175px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.account-role{margin-top:3px;color:#888f9d;text-transform:uppercase;letter-spacing:.12em;font-size:9px;font-weight:750}
-    .icon-button{width:38px;height:38px;display:grid;place-items:center;background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:12px;color:#c4c8d0;transition:all .18s}.icon-button:hover{background:rgba(255,255,255,.11);color:white}
-    .site-main{width:100%;max-width:1600px;margin:0 auto;padding:clamp(24px,4vw,58px) clamp(16px,4vw,58px) 64px;min-height:calc(100vh - 83px)}
-    .portfolio-intro{position:relative;padding:clamp(16px,3vw,38px) 0 25px;display:flex;align-items:flex-end;justify-content:space-between;gap:28px}
-    .eyebrow{display:inline-flex;align-items:center;gap:9px;color:#b4bac7;text-transform:uppercase;font-size:10px;font-weight:800;letter-spacing:.22em}.eyebrow:before{content:"";width:22px;height:1px;background:var(--accent,#8b5cf6)}
-    .portfolio-heading{margin:16px 0 0;font-size:clamp(36px,5.2vw,68px);font-weight:850;line-height:.99;letter-spacing:-.075em;max-width:840px}.portfolio-heading em{font-style:normal;color:var(--accent,#a78bfa)}
-    .portfolio-description{max-width:530px;font-size:14px;line-height:1.8;color:#949aa7;margin-top:18px}.intro-side-note{border:1px solid var(--line);background:linear-gradient(140deg,rgba(255,255,255,.065),rgba(255,255,255,.018));padding:15px 18px;border-radius:16px;color:#a3aab6;font-size:11px;line-height:1.8;min-width:165px}.intro-side-note strong{display:block;color:#f4f4f5;font-size:16px;letter-spacing:-.03em}
-    .portfolio-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:24px}.project-card{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.025));border:1px solid var(--line);border-radius:20px;overflow:hidden;transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;box-shadow:0 12px 40px rgba(0,0,0,.12)}.project-card:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.2);box-shadow:0 24px 55px rgba(0,0,0,.28)}
-    .project-media{position:relative;display:block;width:100%;aspect-ratio:16/9;overflow:hidden;background:#171920}.project-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .55s cubic-bezier(.2,.7,.2,1),opacity .25s}.project-card:hover .project-media img{transform:scale(1.055);opacity:.95}.project-media:after{content:"";position:absolute;inset:40% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.48));pointer-events:none}.project-category{position:absolute;z-index:2;left:14px;top:14px;padding:7px 10px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(9,10,13,.55);backdrop-filter:blur(14px);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.11em}.project-play{position:absolute;z-index:2;inset:0;display:grid;place-items:center}.project-play span{width:52px;height:52px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.42);border-radius:50%;background:rgba(10,10,14,.46);backdrop-filter:blur(12px);box-shadow:0 8px 26px rgba(0,0,0,.25);transition:transform .25s,background .25s}.project-card:hover .project-play span{transform:scale(1.08);background:var(--accent,#8b5cf6)}.project-info{padding:19px}.project-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.project-title{font-size:17px;font-weight:790;line-height:1.35;letter-spacing:-.04em}.project-price{white-space:nowrap;font-size:12px;color:#bdc3cd;font-weight:700}.project-actions{display:flex;gap:8px;margin-top:18px}.primary-action,.secondary-action{min-height:42px;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 13px;border-radius:12px;font-size:12px;font-weight:750;transition:filter .2s,transform .2s}.primary-action{flex:1;color:white}.primary-action:hover,.secondary-action:hover{filter:brightness(1.13);transform:translateY(-1px)}.secondary-action{background:rgba(255,255,255,.045);border:1px solid var(--line);color:#d1d5db}
-    .panel-card{background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.025));border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 42px rgba(0,0,0,.12)}
-    input,textarea,select{transition:border-color .2s,box-shadow .2s}input:focus,textarea:focus,select:focus{border-color:rgba(167,139,250,.7)!important;box-shadow:0 0 0 3px rgba(139,92,246,.13);outline:none}
-    .section-title{font-size:clamp(27px,3vw,40px);font-weight:850;letter-spacing:-.06em;line-height:1.08}.section-lead{color:#9299a7;line-height:1.75;font-size:13px;margin-top:9px}
-    @media(max-width:1050px){.header-inner{gap:18px}.top-nav-link{padding:10px 11px}.top-nav-link span{font-size:12px}.account-copy{display:none}.portfolio-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.portfolio-intro{align-items:flex-start}.intro-side-note{display:none}}
-    @media(max-width:700px){.header-inner{padding:12px 16px;display:grid;grid-template-columns:1fr auto;gap:12px}.brand-mark{width:38px;height:38px;border-radius:12px}.brand-name{font-size:17px}.top-nav{grid-column:1/-1;grid-row:2;width:100%;justify-content:flex-start;overflow-x:auto;border-radius:13px;scrollbar-width:none}.top-nav::-webkit-scrollbar{display:none}.top-nav-link{flex:1;padding:10px 12px;font-size:12px}.top-nav-link span{font-size:11px}.site-main{padding:20px 15px 42px}.portfolio-intro{padding:16px 0 14px}.portfolio-heading{font-size:clamp(37px,11vw,55px)}.portfolio-grid{grid-template-columns:1fr;gap:15px}.project-info{padding:16px}.project-title{font-size:16px}.header-account{gap:8px}.account-avatar{display:none}}
-    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+    :root { color-scheme: dark; --accent:#8b5cf6; }
+    * { box-sizing:border-box }
+    body { margin:0; background:#090b10; color:#f4f4f5; font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    button,input,textarea,select { font:inherit }
+    .glass { background:rgba(20,23,32,.82); border:1px solid rgba(255,255,255,.09); box-shadow:0 18px 60px rgba(0,0,0,.18); }
+    .muted { color:#a1a1aa }
+    .field { width:100%; background:#0c0e15; border:1px solid #303341; border-radius:12px; padding:11px 13px; color:#fff; outline:none; }
+    .field:focus { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent); }
+    .btn { border:1px solid #343744; border-radius:12px; padding:10px 14px; font-weight:650; transition:.15s; cursor:pointer; }
+    .btn:hover { transform:translateY(-1px); filter:brightness(1.08); }
+    .btn-primary { background:var(--accent); color:white; border-color:transparent; }
+    .btn-quiet { background:#171923; color:#f4f4f5; }
+    .btn-danger { background:#3b171d; border-color:#6b2732; color:#fecdd3; }
+    .navlink { padding:9px 12px; border-radius:10px; color:#b8bac6; white-space:nowrap; }
+    .navlink.active,.navlink:hover { background:#222433; color:#fff; }
+    .pill { border-radius:999px; padding:4px 9px; font-size:12px; border:1px solid #393b49; background:#1a1c27; }
+    .hero-grid { background-image:radial-gradient(ellipse at 75% 20%,color-mix(in srgb,var(--accent) 25%,transparent),transparent 42%),linear-gradient(135deg,#121522,#090b10 70%); }
+    .line-clamp-3 { display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden; }
+    .calendar-cell { min-height:88px; border:1px solid #2c2e3a; border-radius:10px; padding:7px; background:#10121a; }
+    .calendar-cell.today { border-color:var(--accent); }
+    .calendar-cell.other { opacity:.4; }
+    @media(max-width:640px){ .calendar-cell{min-height:68px;padding:5px} .navlink{padding:8px 9px;font-size:13px} }
   </style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
-const {useState,useEffect}=React;
+  <div id="root"></div>
+  <script type="text/babel">
+    const {useState,useEffect,useMemo} = React;
 
-/* =========================
-   1) SUPABASE CONFIG
-   =========================
-   Replace ONLY these two values with your Supabase Project URL
-   and Publishable key (or legacy anon key). NEVER put service_role here.
-*/
-const SUPABASE_URL = 'https://nhybunfifvomilevobst.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_TeSV8NnuxNz1XjxutbD1bQ_NJZ5JKe4';
-const supabase = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+    // 1) Remplace ces deux valeurs par celles de Supabase > Project Settings > API.
+    // Utilise uniquement la clé publishable/anon côté navigateur, jamais la service_role.
+    const SUPABASE_URL = "https://nhybunfifvomilevobst.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_TeSV8NnuxNz1XjxutbD1bQ_NJZ5JKe4";
 
-const THEME_PRESETS=[
-  {name:'Violet (Défaut)',color:'#8B5CF6'},{name:'Rouge',color:'#EF4444'},{name:'Vert',color:'#22C55E'},
-  {name:'Bleu',color:'#3B82F6'},{name:'Émeraude',color:'#10B981'},{name:'Or',color:'#F59E0B'},{name:'Rose',color:'#EC4899'}
-];
-const ICONS={video:'🎬',message:'💬',settings:'⚙️',palette:'🎨',card:'💳',send:'➤',users:'👥',dollar:'💶',plus:'＋',check:'✓',play:'▶',file:'📁',shield:'🛡️',brush:'🖌️',trash:'🗑️',link:'🔗',clock:'⏱️',external:'↗',youtube:'▶️',logout:'↪',login:'🔐'};
-function Icon({name,size=20}){return <span style={{fontSize:size,lineHeight:1}}>{ICONS[name]||'•'}</span>}
-function money(n){return `${Number(n||0).toFixed(0)}€`}
-function normalizeVideoUrl(url){const t=url.trim();return /^https?:\/\//i.test(t)?t:`https://${t}`}
-function getYouTubeId(url){
-  try{const u=new URL(normalizeVideoUrl(url));const h=u.hostname.replace(/^www\./,'').toLowerCase();
-    if(h==='youtu.be')return u.pathname.slice(1).split('/')[0]||null;
-    if(['youtube.com','m.youtube.com'].includes(h)){
-      if(u.pathname==='/watch')return u.searchParams.get('v');
-      for(const p of ['/shorts/','/embed/','/live/'])if(u.pathname.startsWith(p))return u.pathname.split('/')[2]||null;
-    }
-  }catch{}
-  return null;
-}
-function getYouTubeThumb(url){const id=getYouTubeId(url);return id?`https://img.youtube.com/vi/${id}/hqdefault.jpg`:''}
+    const supabaseReady = SUPABASE_URL.startsWith("https://") &&
+      !SUPABASE_URL.includes("COLLE_ICI") &&
+      SUPABASE_KEY && !SUPABASE_KEY.includes("COLLE_ICI");
+    const supabase = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-function AuthScreen({onDone}){
-  const[mode,setMode]=useState('login');
-  const[email,setEmail]=useState('');const[password,setPassword]=useState('');const[name,setName]=useState('');
-  const[error,setError]=useState('');const[message,setMessage]=useState('');const[loading,setLoading]=useState(false);
-  async function submit(e){e.preventDefault();setError('');setMessage('');setLoading(true);
-    try{
-      if(mode==='signup'){
-        const{data,error}=await supabase.auth.signUp({email,password,options:{data:{display_name:name.trim()||email.split('@')[0]}}});
-        if(error)throw error;
-        if(!data.session)setMessage('Compte créé. Vérifie ton email puis connecte-toi.'); else onDone(data.session.user);
-      }else{
-        const{data,error}=await supabase.auth.signInWithPassword({email,password});if(error)throw error;onDone(data.user);
+    const money = value => new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Number(value)||0);
+    const niceDate = value => value ? new Date(value).toLocaleString("fr-FR",{dateStyle:"medium",timeStyle:"short"}) : "Non définie";
+    const isoDay = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    const safeText = value => String(value ?? "").trim();
+
+    function App(){
+      const [session,setSession] = useState(null);
+      const [profile,setProfile] = useState(null);
+      const [page,setPage] = useState("accueil");
+      const [loading,setLoading] = useState(true);
+      const [notice,setNotice] = useState("");
+      const [busy,setBusy] = useState(false);
+      const [authMode,setAuthMode] = useState("login");
+      const [authForm,setAuthForm] = useState({email:"",password:"",name:""});
+      const [settings,setSettings] = useState({theme_color:"#8b5cf6",paypal_link:"",base_price:40,rush_price:20,minia_price:15,sous_titres_price:10,rush_delivery_time:"48 heures",portfolio_description:"Du montage gaming rythmé aux formats courts, chaque vidéo est pensée pour capter l’attention et garder le meilleur du contenu."});
+      const [portfolio,setPortfolio] = useState([]);
+      const [tickets,setTickets] = useState([]);
+      const [bookings,setBookings] = useState([]);
+      const [activeTicket,setActiveTicket] = useState(null);
+      const [messages,setMessages] = useState([]);
+      const [messageText,setMessageText] = useState("");
+      const [month,setMonth] = useState(new Date());
+      const [order,setOrder] = useState({title:"",contact:"",brief:"",source_link:"",style:"",rush:false,scheduled_date:"",scheduled_time:""});
+      const [newVideo,setNewVideo] = useState({title:"",category:"Gaming",video_url:"",thumbnail_url:"",price_base:""});
+      const [settingsForm,setSettingsForm] = useState(null);
+
+      const role = profile?.role || "client";
+      const isTeam = role === "admin" || role === "monteur";
+      const isAdmin = role === "admin";
+
+      useEffect(()=>{
+        document.documentElement.style.setProperty("--accent",settings.theme_color || "#8b5cf6");
+      },[settings.theme_color]);
+
+      useEffect(()=>{
+        if(!supabase){setLoading(false);return;}
+        let alive = true;
+        supabase.auth.getSession().then(async ({data})=>{
+          if(!alive)return;
+          setSession(data.session);
+          if(data.session) await loadAll(data.session.user);
+          else setLoading(false);
+        });
+        const {data:{subscription}} = supabase.auth.onAuthStateChange(async (_event,nextSession)=>{
+          if(!alive)return;
+          setSession(nextSession);
+          if(nextSession) await loadAll(nextSession.user);
+          else {setProfile(null);setTickets([]);setBookings([]);setLoading(false);}
+        });
+        return ()=>{alive=false;subscription.unsubscribe();};
+      },[]);
+
+      async function loadAll(user){
+        setLoading(true);
+        try{
+          const {data:prof,error:profErr}=await supabase.from("profiles").select("*").eq("id",user.id).maybeSingle();
+          if(profErr) throw profErr;
+          let actualProfile=prof;
+          if(!actualProfile){
+            const name=user.user_metadata?.display_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "Client";
+            const {data:created,error:createErr}=await supabase.from("profiles").insert({id:user.id,role:"client",display_name:name}).select("*").single();
+            if(createErr) {
+              // Ne bloque pas l'accès si la création automatique est empêchée par les règles RLS.
+              actualProfile={id:user.id,role:"client",display_name:name};
+            } else actualProfile=created;
+          }
+          setProfile(actualProfile);
+          const [sRes,pRes,tRes,bRes]=await Promise.all([
+            supabase.from("settings").select("*").eq("id",1).maybeSingle(),
+            supabase.from("portfolio").select("*").order("created_at",{ascending:false}),
+            supabase.from("tickets").select("*").order("created_at",{ascending:false}),
+            supabase.from("video_bookings").select("*").order("scheduled_at",{ascending:true})
+          ]);
+          if(sRes.data){setSettings(prev=>({...prev,...sRes.data}));setSettingsForm({...settings,...sRes.data});}
+          if(pRes.data)setPortfolio(pRes.data);
+          if(tRes.data)setTickets(tRes.data);
+          if(bRes.data)setBookings(bRes.data);
+          if(tRes.error) console.warn("Tickets:",tRes.error.message);
+          if(bRes.error) console.warn("Réservations:",bRes.error.message);
+        }catch(err){setNotice("Chargement : "+(err.message||"une erreur est survenue"));}
+        finally{setLoading(false);}
       }
-    }catch(err){setError(err.message||'Une erreur est survenue.')}finally{setLoading(false)}
-  }
-  return <div className="min-h-screen bg-[#0f1115] flex items-center justify-center p-6 text-white">
-    <div className="w-full max-w-md bg-gray-900 border border-gray-800 rounded-3xl p-7 shadow-2xl">
-      <div className="text-center mb-7"><div className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center bg-violet-500/10 text-violet-400 mb-4"><Icon name="video" size={28}/></div><h1 className="text-3xl font-black">Wakzil <span className="text-violet-400">Studio</span></h1><p className="text-gray-400 mt-2">{mode==='login'?'Connecte-toi à ton espace':'Crée ton espace client'}</p></div>
-      <form onSubmit={submit} className="space-y-4">
-        {mode==='signup'&&<input value={name} onChange={e=>setName(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 outline-none text-white" placeholder="Nom / pseudo" />}
-        <input required type="email" value={email} onChange={e=>setEmail(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 outline-none text-white" placeholder="Email" />
-        <input required minLength="6" type="password" value={password} onChange={e=>setPassword(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 outline-none text-white" placeholder="Mot de passe" />
-        {error&&<div className="p-3 rounded-xl bg-red-900/30 border border-red-800 text-red-300 text-sm">{error}</div>}
-        {message&&<div className="p-3 rounded-xl bg-emerald-900/30 border border-emerald-800 text-emerald-300 text-sm">{message}</div>}
-        <button disabled={loading} className="w-full py-3 rounded-xl font-bold text-white disabled:opacity-50 bg-violet-600 hover:bg-violet-500">{loading?'Chargement...':mode==='login'?'Se connecter':'Créer mon compte'}</button>
-      </form>
-      <button onClick={()=>{setMode(mode==='login'?'signup':'login');setError('');setMessage('')}} className="w-full mt-4 text-sm text-gray-400 hover:text-white">{mode==='login'?'Pas encore de compte ? Créer un compte':'Déjà un compte ? Se connecter'}</button>
-    </div></div>
-}
 
-function App(){
- const[currentUser,setCurrentUser]=useState(null);const[profile,setProfile]=useState(null);const[loading,setLoading]=useState(true);
- const[activeTab,setActiveTab]=useState('portfolio');const[activeTicketId,setActiveTicketId]=useState(null);
-const[themeColor,setThemeColor]=useState('#8B5CF6');
-const[paypalLink,setPaypalLink]=useState('paypal.me/Wakzil');
-const[prices,setPrices]=useState({base:50,rush:20,minia:15,sousTitres:10});
-const[rushDeliveryTime,setRushDeliveryTime]=useState('48h');
+      async function refreshTickets(){
+        if(!supabase)return;
+        const {data,error}=await supabase.from("tickets").select("*").order("created_at",{ascending:false});
+        if(!error&&data)setTickets(data);
+      }
+      async function refreshBookings(){
+        if(!supabase)return;
+        const {data,error}=await supabase.from("video_bookings").select("*").order("scheduled_at",{ascending:true});
+        if(!error&&data)setBookings(data);
+      }
+      async function signIn(e){
+        e.preventDefault();setBusy(true);setNotice("");
+        try{
+          if(!supabase){setNotice("Ajoute d’abord l’URL et la clé Supabase dans le fichier.");return;}
+          if(authMode==="signup"){
+            const {data,error}=await supabase.auth.signUp({email:authForm.email,password:authForm.password,options:{data:{display_name:authForm.name}}});
+            if(error)throw error;
+            if(data.session){setNotice("Compte créé !");}
+            else setNotice("Compte créé. Vérifie tes e-mails si la confirmation est activée, puis connecte-toi.");
+          }else{
+            const {error}=await supabase.auth.signInWithPassword({email:authForm.email,password:authForm.password});
+            if(error)throw error;
+          }
+        }catch(err){setNotice(err.message||"Connexion impossible.");}
+        finally{setBusy(false);}
+      }
+      async function logout(){await supabase?.auth.signOut();setSession(null);setProfile(null);setPage("accueil");}
 
-const[portfolioDescription,setPortfolioDescription]=useState(
-  'Du montage gaming rythmé aux formats courts, chaque vidéo est pensée pour capter l’attention, raconter quelque chose et garder le meilleur du contenu.'
-);
-const[bookingDate,setBookingDate]=useState('');
-const[bookingTime,setBookingTime]=useState('');
-const[bookings,setBookings]=useState([]);
-const[calendarMonth,setCalendarMonth]=useState(
-  ()=>new Date(new Date().getFullYear(),new Date().getMonth(),1)
-);
-const[selectedCalendarDate,setSelectedCalendarDate]=useState('');
- const[portfolio,setPortfolio]=useState([]);const[tickets,setTickets]=useState([]);const[activeTicket,setActiveTicket]=useState(null);const[msgInput,setMsgInput]=useState('');const[memberInput,setMemberInput]=useState('');
- const[orderError,setOrderError]=useState('');const[adminTab,setAdminTab]=useState('parametres');const[notice,setNotice]=useState('');
- const[newVideo,setNewVideo]=useState({url:'',title:'',category:'Mes vidéos',priceBase:50});const[videoError,setVideoError]=useState('');const[thumbPreview,setThumbPreview]=useState('');
- const[orderDraft,setOrderDraft]=useState({style:null,clientName:'',discordOrEmail:'',brief:'',link:'',options:{rush:false,minia:false,sousTitres:false}});
+      async function createOrder(e){
+        e.preventDefault();
+        if(!session){setPage("compte");setNotice("Connecte-toi pour envoyer une demande.");return;}
+        setBusy(true);setNotice("");
+        try{
+          const chosenStyle=order.style ? `Style : ${order.style}\n` : "";
+          const brief=[chosenStyle,order.brief].filter(Boolean).join("\n");
+          const price=(Number(settings.base_price)||0)+(order.rush?(Number(settings.rush_price)||0):0);
+          const payload={
+            title:safeText(order.title),
+            price,
+            client_id:session.user.id,
+            client_name:profile?.display_name || session.user.email,
+            contact:safeText(order.contact),
+            brief,
+            rush:!!order.rush,
+            rush_delivery_time:order.rush?(settings.rush_delivery_time||"48 heures"):null,
+            source_link:safeText(order.source_link),
+            selected_style_id:null,
+            status:"En attente"
+          };
+          const {data,error}=await supabase.from("tickets").insert(payload).select("*").single();
+          if(error)throw error;
+          if(order.scheduled_date && order.scheduled_time){
+            const scheduledAt=new Date(`${order.scheduled_date}T${order.scheduled_time}`).toISOString();
+            const bookingPayload={client_id:session.user.id,client_name:profile?.display_name||session.user.email,title:order.title,scheduled_at:scheduledAt,notes:brief,status:"À planifier",ticket_id:String(data.id)};
+            const {error:bookingError}=await supabase.from("video_bookings").insert(bookingPayload);
+            if(bookingError) setNotice("Demande créée, mais réservation non enregistrée : "+bookingError.message);
+          }
+          setNotice(prev=>prev||"Demande envoyée avec succès !");
+          setOrder({title:"",contact:"",brief:"",source_link:"",style:"",rush:false,scheduled_date:"",scheduled_time:""});
+          await refreshTickets();await refreshBookings();setPage("tickets");
+        }catch(err){setNotice(err.message||"Impossible de créer la demande.");}
+        finally{setBusy(false);}
+      }
 
- const role=profile?.role||'client';
- const allPortfolio=portfolio.filter(item => item.is_custom === true);
+      async function openTicket(ticket){
+        setActiveTicket(ticket);setPage("ticket-detail");
+        const {data,error}=await supabase.from("ticket_messages").select("*").eq("ticket_id",ticket.id).order("created_at",{ascending:true});
+        if(error){setMessages([]);setNotice("Messages : "+error.message);}else setMessages(data||[]);
+      }
+      async function sendMessage(e){
+        e?.preventDefault();
+        if(!messageText.trim()||!activeTicket)return;
+        if(activeTicket.status==="Fermé"){setNotice("Ce ticket est fermé. Réouvre-le avant d’envoyer un message.");return;}
+        const {error}=await supabase.from("ticket_messages").insert({ticket_id:activeTicket.id,sender_id:session.user.id,text:messageText.trim()});
+        if(error){setNotice(error.message);return;}
+        setMessageText("");
+        await openTicket(activeTicket);
+      }
+      async function updateTicketStatus(ticket,nextStatus){
+        if(!isTeam){setNotice("Seuls les monteurs et administrateurs peuvent modifier le statut.");return;}
+        const {data,error}=await supabase.from("tickets").update({status:nextStatus}).eq("id",ticket.id).select("*").single();
+        if(error){setNotice("Impossible de modifier le statut : "+error.message);return;}
+        setTickets(prev=>prev.map(t=>t.id===ticket.id?data:t));
+        setActiveTicket(data);
+        setNotice(nextStatus==="Fermé"?"Ticket fermé.":"Ticket réouvert.");
+      }
+      async function saveSettings(e){
+        e.preventDefault();if(!isAdmin)return;setBusy(true);setNotice("");
+        try{
+          const {error}=await supabase.from("settings").upsert({...settingsForm,id:1},{onConflict:"id"});
+          if(error)throw error;
+          setSettings(prev=>({...prev,...settingsForm}));setNotice("Paramètres enregistrés.");
+        }catch(err){setNotice("Paramètres : "+err.message);}
+        finally{setBusy(false);}
+      }
+      async function addPortfolio(e){
+        e.preventDefault();if(!isAdmin)return;setBusy(true);setNotice("");
+        try{
+          const payload={title:newVideo.title,category:newVideo.category,video_url:newVideo.video_url,price_base:newVideo.price_base?Number(newVideo.price_base):null};
+          if(newVideo.thumbnail_url)payload.thumbnail_url=newVideo.thumbnail_url;
+          const {error}=await supabase.from("portfolio").insert(payload);
+          if(error)throw error;
+          setNewVideo({title:"",category:"Gaming",video_url:"",thumbnail_url:"",price_base:""});
+          const {data}=await supabase.from("portfolio").select("*").order("created_at",{ascending:false});if(data)setPortfolio(data);
+          setNotice("Vidéo ajoutée au portfolio.");
+        }catch(err){setNotice("Portfolio : "+err.message+" (vérifie les colonnes disponibles dans ta table portfolio).");}
+        finally{setBusy(false);}
+      }
+      async function deletePortfolio(item){
+        if(!isAdmin||!confirm(`Supprimer « ${item.title} » du portfolio ?`))return;
+        const {error}=await supabase.from("portfolio").delete().eq("id",item.id);
+        if(error){setNotice(error.message);return;}
+        setPortfolio(prev=>prev.filter(p=>p.id!==item.id));setNotice("Vidéo supprimée.");
+      }
 
- useEffect(()=>{
-   let alive=true;
-   supabase.auth.getSession().then(async({data})=>{if(!alive)return;if(data.session?.user)await loadUser(data.session.user);else setLoading(false)});
-   const{data:{subscription}}=supabase.auth.onAuthStateChange(async(_,session)=>{if(session?.user)await loadUser(session.user);else{setCurrentUser(null);setProfile(null);setLoading(false)}});
-   return()=>{alive=false;subscription.unsubscribe()};
- },[]);
- useEffect(()=>{if(currentUser)refreshPublicData()},[currentUser]);
- async function loadUser(user){setCurrentUser(user);const{data,error}=await supabase.from('profiles').select('*').eq('id',user.id).single();if(!error)setProfile(data);setLoading(false)}
- async function refreshPublicData(){
-   const[settingsRes,portfolioRes]=await Promise.all([supabase.from('settings').select('*').eq('id',1).single(),supabase.from('portfolio').select('*').order('created_at',{ascending:true})]);
-if(settingsRes.data){
-  setThemeColor(settingsRes.data.theme_color || '#8B5CF6');
-  setPaypalLink(settingsRes.data.paypal_link || 'paypal.me/Wakzil');
-  setPrices({
-    base:Number(settingsRes.data.base_price ?? 50),
-    rush:Number(settingsRes.data.rush_price ?? 20),
-    minia:Number(settingsRes.data.minia_price ?? 15),
-    sousTitres:Number(settingsRes.data.sous_titres_price ?? 10)
-  });
-  setRushDeliveryTime(settingsRes.data.rush_delivery_time || '48h');
-  if(settingsRes.data.portfolio_description){
-    setPortfolioDescription(settingsRes.data.portfolio_description);
-  }
-}
-   if(portfolioRes.data)setPortfolio(portfolioRes.data);
-   if(currentUser)await loadTickets();
- }
- async function loadTickets(){const q=supabase.from('tickets').select('*').order('created_at',{ascending:false});const{data,error}=role==='client'?await q.eq('client_id',currentUser.id):await q;if(!error){setTickets(data||[]);if(activeTicketId&&!data?.some(t=>t.id===activeTicketId))setActiveTicketId(null)}}
- async function openTicket(ticket){setActiveTicketId(ticket.id);const{data}=await supabase.from('ticket_messages').select('*').eq('ticket_id',ticket.id).order('created_at',{ascending:true});setActiveTicket({...ticket,messages:data||[]})}
- useEffect(()=>{if(activeTicketId){const t=tickets.find(x=>x.id===activeTicketId);if(t)openTicket(t)}else setActiveTicket(null)},[activeTicketId,tickets.length]);
- function goTab(tab){if(tab==='admin'&&role!=='admin')return;if(tab==='tickets')loadTickets();setActiveTab(tab)}
- function calculatePrice(){let total=orderDraft.style?Number(orderDraft.style.price_base):Number(prices.base);if(orderDraft.options.rush)total+=Number(prices.rush);if(orderDraft.options.minia)total+=Number(prices.minia);if(orderDraft.options.sousTitres)total+=Number(prices.sousTitres);return total}
- async function handleCreateTicket(){setOrderError('');if(!orderDraft.clientName.trim()||!orderDraft.discordOrEmail.trim()||!orderDraft.brief.trim()||!orderDraft.link.trim()){setOrderError('Veuillez remplir tous les champs obligatoires.');return}
-   const code=`#TICK-${Math.floor(Math.random()*100000).toString().padStart(5,'0')}`;const payload={public_code:code,title:orderDraft.style?`Commande: ${orderDraft.style.title}`:'Nouvelle Commande',price:calculatePrice(),client_id:currentUser.id,client_name:orderDraft.clientName.trim(),contact:orderDraft.discordOrEmail.trim(),brief:orderDraft.brief.trim(),rush:orderDraft.options.rush,rush_delivery_time:orderDraft.options.rush?rushDeliveryTime:null,source_link:orderDraft.link.trim(),selected_style_id:orderDraft.style?.id||null};
-   const{data,error}=await supabase.from('tickets').insert(payload).select('*').single();if(error){setOrderError(error.message);return}
-   const{text:errorText}=await insertMessage(data.id,`Commande créée.\nBrief : ${payload.brief}\n\nLien des rushs : ${payload.source_link}${payload.rush?`\n\nLivraison Express : ${payload.rush_delivery_time}`:''}`);if(errorText){setOrderError(errorText);return}
-   setTickets(t=>[data,...t]);setOrderDraft({style:null,clientName:'',discordOrEmail:'',brief:'',link:'',options:{rush:false,minia:false,sousTitres:false}});setActiveTicketId(data.id);setActiveTab('tickets');
- }
- async function insertMessage(ticketId,textValue){const{error}=await supabase.from('ticket_messages').insert({ticket_id:ticketId,sender_id:currentUser.id,text:textValue});return {text:error?.message||null}}
- async function sendMessage(){if(!msgInput.trim()||!activeTicket)return;const{error}=await supabase.from('ticket_messages').insert({ticket_id:activeTicket.id,sender_id:currentUser.id,text:msgInput.trim()});if(error){setNotice(error.message);return}setMsgInput('');await openTicket(activeTicket)}
- async function addMemberToTicket(){if(!memberInput.trim()||!activeTicket)return;await insertMessage(activeTicket.id,`🤝 ${memberInput.trim()} a été ajouté au ticket.`);setMemberInput('');await openTicket(activeTicket)}
- async function saveSettings(patch){const{error}=await supabase.from('settings').update(patch).eq('id',1);if(error)setNotice(error.message);else{setNotice('Paramètres enregistrés.');await refreshPublicData()}}
- async function addVideo(e){e.preventDefault();setVideoError('');const url=normalizeVideoUrl(newVideo.url);const id=getYouTubeId(url);if(!id){setVideoError('Pour la miniature automatique, utilise un lien YouTube (youtube.com ou youtu.be).');return}if(!newVideo.title.trim()){setVideoError('Ajoute un titre.');return}
-   const{data,error}=await supabase.from('portfolio').insert({title:newVideo.title.trim(),category:newVideo.category.trim()||'Mes vidéos',price_base:Number(newVideo.priceBase)||50,video_url:url,thumbnail_url:`https://img.youtube.com/vi/${id}/hqdefault.jpg`,is_custom:true,created_by:currentUser.id}).select('*').single();if(error){setVideoError(error.message);return}setPortfolio(p=>[...p,data]);setNewVideo({url:'',title:'',category:'Mes vidéos',priceBase:50});setThumbPreview('');setNotice('Exemple ajouté.');}
- async function deleteVideo(id){if(!confirm('Supprimer cet exemple ?'))return;const{error}=await supabase.from('portfolio').delete().eq('id',id);if(error)setNotice(error.message);else{setPortfolio(p=>p.filter(v=>v.id!==id));if(activeTab==='portfolio')setNotice('Exemple supprimé.')}}
- async function signOut(){await supabase.auth.signOut();}
- if(loading)return <div className="min-h-screen bg-[#0f1115] text-white flex items-center justify-center">Chargement...</div>;
- if(!currentUser||!profile)return <AuthScreen onDone={u=>loadUser(u)} />;
- const clickablePaypalLink=()=>paypalLink.trim()?( /^https?:\/\//i.test(paypalLink.trim())?paypalLink.trim():`https://${paypalLink.trim()}` ):'#';
- const tabs=[{id:'portfolio',label:'Exemples',icon:'file'},{id:'order',label:'Commander',icon:'plus'},{id:'tickets',label:'Tickets',icon:'message'}];if(role==='admin')tabs.push({id:'admin',label:'Admin',icon:'settings'});
- return <div className="site-shell min-h-screen font-sans text-white flex flex-col" style={{'--accent':themeColor}}>
-   <header className="site-header">
-     <div className="header-inner">
-       <button className="brand-button" onClick={()=>goTab('portfolio')} aria-label="Retour aux exemples">
-         <span className="brand-mark" style={{color:themeColor}}><Icon name="video" size={23}/></span>
-         <span><span className="brand-name">Wakzil <span style={{color:themeColor}}>Studio</span></span><span className="brand-subtitle">CREATIVE VIDEO STUDIO</span></span>
-       </button>
-       <nav className="top-nav" aria-label="Navigation principale">
-         {tabs.map(tab=><button key={tab.id} onClick={()=>goTab(tab.id)} className={`top-nav-link ${activeTab===tab.id?'is-active':''}`} style={activeTab===tab.id?{'--accent':themeColor}: {}} aria-current={activeTab===tab.id?'page':undefined}><Icon name={tab.icon} size={17}/><span>{tab.label}</span></button>)}
-       </nav>
-       <div className="header-account">
-         <div className="account-avatar" style={{borderColor:`${themeColor}55`,color:themeColor}}>{(profile.display_name||currentUser.email||'W').slice(0,1).toUpperCase()}</div>
-         <div className="account-copy"><div className="account-name">{profile.display_name||currentUser.email}</div><div className="account-role">{role==='admin'?'Administrateur':role==='monteur'?'Monteur':'Espace client'}</div></div>
-         <button onClick={signOut} className="icon-button" title="Déconnexion" aria-label="Se déconnecter"><Icon name="logout" size={17}/></button>
-       </div>
-     </div>
-   </header>
-   <main className="site-main">
-       {activeTab==='portfolio'&&<div className="space-y-7"><section className="portfolio-intro"><div><div className="eyebrow">Portfolio · Wakzil Studio</div><h2 className="portfolio-heading">Des vidéos qui<br/><em>marquent les esprits.</em></h2><p className="portfolio-description">Du montage gaming rythmé aux formats courts, chaque vidéo est pensée pour capter l’attention, raconter quelque chose et garder le meilleur du contenu.</p></div><div className="intro-side-note"><strong>Création sur mesure</strong>Montage · Rythme · Identité visuelle</div></section><div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4"><div><div className="text-sm font-bold">Sélection de projets</div><div className="text-xs text-gray-500 mt-1">Choisis un style pour démarrer ta commande.</div></div>{role==='admin'&&<button onClick={()=>{setAdminTab('exemples');setActiveTab('admin')}} className="px-4 py-2.5 rounded-xl font-bold text-sm hover:brightness-110" style={{backgroundColor:themeColor}}>＋ Gérer les exemples</button>}</div>
-         <div className="portfolio-grid">{allPortfolio.map(item=><article key={item.id} className="project-card"><a href={item.video_url} target="_blank" rel="noreferrer" className="project-media" aria-label={`Voir ${item.title}`}><img src={item.thumbnail_url} alt={item.title} loading="lazy"/><span className="project-category">{item.category}</span><span className="project-play"><span><Icon name="play" size={22}/></span></span></a><div className="project-info"><div className="project-title-row"><h3 className="project-title">{item.title}</h3><span className="project-price">{money(item.price_base)}<span className="text-gray-500 font-normal"> +</span></span></div><div className="project-actions"><button onClick={()=>{setOrderDraft(o=>({...o,style:item}));setActiveTab('order')}} className="primary-action" style={{backgroundColor:themeColor}}>Choisir ce style <span aria-hidden="true">↗</span></button>{role==='admin'&&item.is_custom&&<button onClick={()=>deleteVideo(item.id)} className="secondary-action" title="Supprimer cet exemple"><Icon name="trash" size={16}/></button>}</div></div></article>)}</div>
-       </div>}
+      const visibleTickets=useMemo(()=>tickets.filter(t=>isTeam||t.client_id===session?.user?.id),[tickets,isTeam,session]);
+      const monthLabel=month.toLocaleDateString("fr-FR",{month:"long",year:"numeric"});
+      const calendarDays=useMemo(()=>{
+        const first=new Date(month.getFullYear(),month.getMonth(),1);
+        const start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
+        return Array.from({length:42},(_,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);return d;});
+      },[month]);
 
-       {activeTab==='order'&&<div className="max-w-5xl mx-auto space-y-8"><div><div className="eyebrow">Projet sur mesure</div><h2 className="section-title mt-4">Nouvelle commande</h2><p className="section-lead">Décris ton projet. On s’occupe de transformer tes rushs en une vidéo aboutie.</p></div><div className="grid grid-cols-1 lg:grid-cols-3 gap-8"><div className="lg:col-span-2 space-y-6 bg-gray-800 p-6 rounded-2xl border border-gray-700">
-          {orderDraft.style&&<div className="flex items-center justify-between p-4 bg-gray-900 rounded-xl border border-gray-700"><div><p className="text-sm text-gray-400">Style sélectionné</p><p className="font-bold">{orderDraft.style.title}</p></div><button onClick={()=>setOrderDraft(o=>({...o,style:null}))} className="text-sm text-red-400">Retirer</button></div>}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><input value={orderDraft.clientName} onChange={e=>setOrderDraft(o=>({...o,clientName:e.target.value}))} className="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 outline-none" placeholder="Votre pseudo *"/><input value={orderDraft.discordOrEmail} onChange={e=>setOrderDraft(o=>({...o,discordOrEmail:e.target.value}))} className="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 outline-none" placeholder="Discord ou Email *"/></div>
-          <textarea value={orderDraft.brief} onChange={e=>setOrderDraft(o=>({...o,brief:e.target.value}))} className="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 outline-none h-36 resize-none" placeholder="Brief / explications du montage *"/>
-          <input value={orderDraft.link} onChange={e=>setOrderDraft(o=>({...o,link:e.target.value}))} className="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 outline-none" placeholder="Lien des rushs (Google Drive, WeTransfer...) *"/>
-          <div><div className="text-sm font-medium text-gray-300 mb-3">Options supplémentaires</div><div className="space-y-2">{[{id:'rush',label:`Livraison Express (${rushDeliveryTime})`,price:prices.rush},{id:'minia',label:'Création Miniature',price:prices.minia},{id:'sousTitres',label:'Sous-titres animés',price:prices.sousTitres}].map(opt=><label key={opt.id} className="flex items-center justify-between p-4 rounded-xl border border-gray-700 bg-gray-900 cursor-pointer"><span className="flex items-center gap-3"><input type="checkbox" checked={orderDraft.options[opt.id]} onChange={e=>setOrderDraft(o=>({...o,options:{...o.options,[opt.id]:e.target.checked}}))} className="w-5 h-5"/><span className="font-medium">{opt.label}</span></span><span className="text-gray-400">+{money(opt.price)}</span></label>)}</div></div>
-        </div><div><div className="bg-gray-800 p-6 rounded-2xl border border-gray-700 sticky top-6"><h3 className="text-xl font-bold mb-5">Résumé</h3><div className="space-y-3 text-sm text-gray-300"><div className="flex justify-between"><span>Base</span><span>{money(orderDraft.style?orderDraft.style.price_base:prices.base)}</span></div>{orderDraft.options.rush&&<div className="flex justify-between"><span>Express ({rushDeliveryTime})</span><span>+{money(prices.rush)}</span></div>}{orderDraft.options.minia&&<div className="flex justify-between"><span>Miniature</span><span>+{money(prices.minia)}</span></div>}{orderDraft.options.sousTitres&&<div className="flex justify-between"><span>Sous-titres</span><span>+{money(prices.sousTitres)}</span></div>}</div><div className="border-t border-gray-700 mt-5 pt-5"><div className="flex justify-between items-end mb-5"><span className="text-gray-400">Total estimé</span><span className="text-3xl font-bold">{money(calculatePrice())}</span></div>{orderError&&<div className="mb-4 p-3 rounded-xl bg-red-900/40 border border-red-800 text-red-300 text-sm">{orderError}</div>}<button onClick={handleCreateTicket} className="w-full py-3.5 rounded-xl font-bold text-lg hover:brightness-110" style={{backgroundColor:themeColor}}>Ouvrir un ticket</button></div></div></div></div></div>}
+      function videoId(url){
+        const match=String(url||"").match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+        return match?match[1]:null;
+      }
+      function VideoCard({item}){
+        const id=videoId(item.video_url);
+        return <article className="glass rounded-2xl overflow-hidden">
+          <div className="aspect-video bg-black">
+            {id?<iframe className="w-full h-full" src={`https://www.youtube-nocookie.com/embed/${id}`} title={item.title} loading="lazy" allowFullScreen></iframe>:
+              item.thumbnail_url?<a href={item.video_url} target="_blank" rel="noreferrer"><img className="w-full h-full object-cover" src={item.thumbnail_url} alt={item.title}/></a>:
+              <a href={item.video_url} target="_blank" rel="noreferrer" className="w-full h-full flex items-center justify-center text-5xl">▶</a>}
+          </div>
+          <div className="p-4 flex items-start justify-between gap-3"><div><div className="text-xs muted mb-1">{item.category||"Vidéo"}</div><h3 className="font-bold">{item.title}</h3>{item.price_base!=null&&<p className="muted text-sm mt-1">À partir de {money(item.price_base)}</p>}</div>{isAdmin&&<button className="btn btn-danger text-sm" onClick={()=>deletePortfolio(item)}>Supprimer</button>}</div>
+        </article>;
+      }
 
-       {activeTab==='tickets'&&<div className="flex flex-col lg:flex-row min-h-[65vh] panel-card overflow-hidden">{tickets.length===0?<div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-4"><Icon name="message" size={54}/><p>Aucun ticket.</p><button onClick={()=>setActiveTab('order')} style={{color:themeColor}}>Créer une commande</button></div>:<><div className="w-full lg:w-80 shrink-0 border-b lg:border-b-0 lg:border-r border-gray-800 bg-black/10 overflow-y-auto max-h-64 lg:max-h-none"><div className="p-4 border-b border-gray-800"><h3 className="text-lg font-bold">{role==='client'?'Vos Tickets':'Tickets'}</h3></div><div className="p-2 space-y-2">{tickets.map(t=><button key={t.id} onClick={()=>openTicket(t)} className={`w-full text-left p-4 rounded-xl ${activeTicketId===t.id?'bg-gray-800':'hover:bg-gray-800/50'}`} style={activeTicketId===t.id?{borderLeft:`4px solid ${themeColor}`}:{borderLeft:'4px solid transparent'}}><div className="flex justify-between items-center gap-2 mb-2"><span className="font-bold truncate">{t.public_code}</span><span className="text-xs px-2 py-1 bg-gray-700 rounded-full">{t.status}</span></div><p className="text-sm text-gray-400 truncate">{t.client_name} - {t.title}</p></button>)}</div></div><div className="flex-1 min-w-0 flex flex-col bg-white/[0.015]">{activeTicket?<><div className="p-4 border-b border-gray-700 bg-gray-900 flex flex-wrap justify-between gap-3 items-center"><div><h3 className="text-xl font-bold">{activeTicket.title} <span className="text-sm font-normal text-gray-400">{activeTicket.public_code}</span></h3><p className="text-sm text-gray-400">Client : <span className="text-white">{activeTicket.client_name}</span> ({activeTicket.contact})</p></div><div className="flex items-center gap-2">{role!=='client'&&<div className="flex bg-gray-800 rounded-lg border border-gray-700"><input value={memberInput} onChange={e=>setMemberInput(e.target.value)} placeholder="Ajouter un pote..." className="bg-transparent px-2 text-xs outline-none"/><button onClick={addMemberToTicket} className="p-1 bg-gray-700 rounded"><Icon name="plus" size={16}/></button></div>}<button onClick={()=>window.open(clickablePaypalLink(),'_blank')} className="px-4 py-2 rounded-lg font-bold hover:brightness-110" style={{backgroundColor:themeColor}}><Icon name="card" size={17}/> Payer {money(activeTicket.price)}</button></div></div><div className="flex-1 overflow-y-auto p-6 space-y-4">{(activeTicket.messages||[]).map(msg=><div key={msg.id} className={`flex ${msg.sender_id===currentUser.id?'justify-end':'justify-start'}`}><div className={`max-w-[75%] rounded-2xl p-4 ${msg.sender_id===currentUser.id?'text-white':'bg-gray-700 text-white'}`} style={msg.sender_id===currentUser.id?{backgroundColor:themeColor}:{}}><div className="text-xs opacity-70 mb-1">{msg.sender_id===currentUser.id?'Vous':role==='admin'?'Membre de l’équipe':'Monteur'}</div><div className="whitespace-pre-wrap">{msg.text}</div></div></div>)}</div><div className="p-4 bg-gray-900 border-t border-gray-700"><div className="flex gap-2"><input value={msgInput} onChange={e=>setMsgInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&sendMessage()} placeholder="Écrivez un message..." className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 outline-none"/><button onClick={sendMessage} className="p-3 rounded-xl" style={{backgroundColor:themeColor}}><Icon name="send" size={20}/></button></div></div></>:<div className="flex-1 flex items-center justify-center text-gray-500">Sélectionnez un ticket.</div>}</div></>}</div>}
+      if(!supabaseReady){
+        return <div className="min-h-screen flex items-center justify-center p-5">
+          <div className="glass max-w-xl w-full rounded-3xl p-7">
+            <div className="text-sm font-bold mb-3" style={{color:"#a78bfa"}}>WAKZIL STUDIO</div>
+            <h1 className="text-3xl font-black mb-3">Ton site est presque prêt.</h1>
+            <p className="muted mb-5">Pour connecter la connexion, les tickets et le calendrier, colle les deux valeurs Supabase dans le début du fichier.</p>
+            <ol className="list-decimal pl-5 space-y-2 muted">
+              <li>Ouvre <b className="text-white">Supabase → Project Settings → API</b>.</li>
+              <li>Copie l’URL du projet dans <code className="text-white">SUPABASE_URL</code>.</li>
+              <li>Copie la clé <b className="text-white">publishable</b> (ou anon) dans <code className="text-white">SUPABASE_KEY</code>.</li>
+              <li>Enregistre le fichier puis recharge la page.</li>
+            </ol>
+            <p className="text-sm mt-5 text-amber-200">N’utilise jamais la clé <code>service_role</code> dans un fichier HTML public.</p>
+          </div>
+        </div>;
+      }
 
-       {activeTab==='admin'&&role==='admin'&&<div className="p-8 max-w-6xl mx-auto space-y-6"><div><h2 className="text-3xl font-bold">Panneau d’Administration</h2><p className="text-gray-400 mt-1">Ces réglages sont stockés dans Supabase et sont donc partagés avec tous les visiteurs.</p></div><div className="flex gap-3 border-b border-gray-800 pb-2 overflow-x-auto">{[{id:'parametres',label:'Paramètres'},{id:'tarifs',label:'Tarifs'},{id:'exemples',label:'Exemples'},{id:'equipe',label:'Équipe'}].map(t=><button key={t.id} onClick={()=>setAdminTab(t.id)} className={`px-4 py-2 ${adminTab===t.id?'text-white':'text-gray-500'}`} style={adminTab===t.id?{borderBottom:`2px solid ${themeColor}`,color:themeColor}: {}}>{t.label}</button>)}</div>
-         {notice&&<div className="p-3 rounded-xl bg-emerald-900/30 border border-emerald-800 text-emerald-300">{notice}</div>}
-         {adminTab==='parametres'&&<div className="space-y-6"><div className="panel-card p-6"><h3 className="text-xl font-bold mb-4">Thème</h3><div className="flex flex-wrap gap-3 mb-5">{THEME_PRESETS.map(p=><button key={p.color} onClick={()=>{setThemeColor(p.color);saveSettings({theme_color:p.color})}} title={p.name} className="w-10 h-10 rounded-full border-2" style={{backgroundColor:p.color,borderColor:themeColor===p.color?'white':'transparent'}}>{themeColor===p.color&&<Icon name="check" size={16}/>}</button>)}</div><div className="flex items-center gap-3"><input type="color" value={themeColor} onChange={e=>{setThemeColor(e.target.value);saveSettings({theme_color:e.target.value})}}/><span className="font-mono text-sm text-gray-400">{themeColor.toUpperCase()}</span></div></div><div className="panel-card p-6"><h3 className="text-xl font-bold mb-4">Paiement</h3><input value={paypalLink} onChange={e=>setPaypalLink(e.target.value)} onBlur={()=>saveSettings({paypal_link:paypalLink})} className="w-full max-w-lg bg-gray-900 border border-gray-700 rounded-xl p-3 outline-none" placeholder="paypal.me/VotrePseudo"/></div></div>}
-         {adminTab==='tarifs'&&<div className="panel-card p-6"><h3 className="text-xl font-bold mb-5">Prix et livraison Express</h3><div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">{[['base','Montage de base','base_price'],['rush','Prix Express','rush_price'],['minia','Miniature','minia_price'],['sousTitres','Sous-titres','sous_titres_price']].map(([key,label,col])=><label key={key} className="bg-gray-900 p-4 rounded-xl"><span className="block text-sm text-gray-400 mb-2">{label}</span><div className="flex gap-2"><input type="number" min="0" value={prices[key]} onChange={e=>setPrices(p=>({...p,[key]:Number(e.target.value)}))} onBlur={()=>saveSettings({[col]:prices[key]})} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 outline-none"/><span className="self-center text-gray-400">€</span></div></label>)}<label className="bg-gray-900 p-4 rounded-xl md:col-span-2"><span className="block text-sm text-gray-400 mb-2">Délai de livraison Express</span><input value={rushDeliveryTime} onChange={e=>setRushDeliveryTime(e.target.value)} onBlur={()=>saveSettings({rush_delivery_time:rushDeliveryTime})} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 outline-none" placeholder="Ex : 24h, 48h, 72h"/></label></div></div>}
-         {adminTab==='exemples'&&<div className="space-y-6"><div className="panel-card p-6"><h3 className="text-xl font-bold mb-4">Ajouter une vidéo</h3><form onSubmit={addVideo} className="grid grid-cols-1 md:grid-cols-2 gap-4"><input required value={newVideo.title} onChange={e=>setNewVideo(v=>({...v,title:e.target.value}))} className="bg-gray-900 border border-gray-700 rounded-xl p-3 outline-none" placeholder="Titre"/><input value={newVideo.category} onChange={e=>setNewVideo(v=>({...v,category:e.target.value}))} className="bg-gray-900 border border-gray-700 rounded-xl p-3 outline-none" placeholder="Catégorie"/><input required value={newVideo.url} onChange={e=>{const value=e.target.value;setNewVideo(v=>({...v,url:value}));setThumbPreview(getYouTubeThumb(value))}} className="md:col-span-2 bg-gray-900 border border-gray-700 rounded-xl p-3 outline-none" placeholder="Lien YouTube"/><div className="flex gap-2 items-center"><input type="number" min="0" value={newVideo.priceBase} onChange={e=>setNewVideo(v=>({...v,priceBase:Number(e.target.value)}))} className="w-32 bg-gray-900 border border-gray-700 rounded-xl p-3 outline-none"/><span className="text-gray-400">€ prix de base</span></div>{thumbPreview&&<img src={thumbPreview} alt="Aperçu miniature" className="h-24 rounded-xl object-cover"/>}{videoError&&<div className="md:col-span-2 p-3 rounded-xl bg-red-900/30 border border-red-800 text-red-300 text-sm">{videoError}</div>}<button className="md:col-span-2 py-3 rounded-xl font-bold hover:brightness-110" style={{backgroundColor:themeColor}}>Ajouter l’exemple</button></form></div><div className="grid grid-cols-1 md:grid-cols-2 gap-5">{portfolio.filter(v=>v.is_custom).map(v=><div key={v.id} className="panel-card overflow-hidden"><img src={v.thumbnail_url} className="w-full h-44 object-cover"/><div className="p-4"><div className="font-bold">{v.title}</div><div className="text-sm text-gray-400">{v.category} · {money(v.price_base)}</div><button onClick={()=>deleteVideo(v.id)} className="mt-3 w-full py-2 rounded-xl bg-red-900/30 border border-red-800 text-red-300">Supprimer</button></div></div>)}</div></div>}
-         {adminTab==='equipe'&&<div className="panel-card p-6"><h3 className="text-xl font-bold mb-5">Comptes autorisés</h3><p className="text-gray-400 text-sm">Les rôles sont gérés dans <b>Supabase → Table Editor → profiles</b>. Mets <b>admin</b> pour ton compte et <b>monteur</b> pour un monteur. Ne mets jamais une clé service_role dans ce site.</p></div>}
-       </div>}
-       {activeTab==='admin'&&role!=='admin'&&<div className="p-8 text-red-300 flex items-center gap-2"><Icon name="shield"/> Accès refusé.</div>}
-   </main>
- </div>
-}
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
-</script>
-</body></html>
+      return <div className="min-h-screen">
+        <header className="sticky top-0 z-30 border-b border-white/10 backdrop-blur-xl bg-[#090b10]/90">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-3">
+            <button onClick={()=>setPage("accueil")} className="flex items-center gap-3 text-left shrink-0">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-xl" style={{background:settings.theme_color}}>W</div>
+              <div><div className="font-black tracking-wide">WAKZIL <span style={{color:settings.theme_color}}>STUDIO</span></div><div className="text-xs muted">Montage vidéo & création</div></div>
+            </button>
+            <nav className="flex items-center gap-1 overflow-x-auto">
+              {[["accueil","Accueil"],["portfolio","Portfolio"],["commande","Commander"],...(session?[["tickets","Mes tickets"]]:[]),...(isTeam?[["calendrier","Calendrier"]]:[]),...(isAdmin?[["admin","Administration"]]:[])].map(([key,label])=><button key={key} onClick={()=>setPage(key)} className={`navlink ${page===key?"active":""}`}>{label}</button>)}
+            </nav>
+            <div className="hidden md:flex items-center gap-2 shrink-0">
+              {session?<><span className="text-sm muted max-w-28 truncate">{profile?.display_name||session.user.email}</span><button className="btn btn-quiet text-sm" onClick={logout}>Déconnexion</button></>:<button className="btn btn-primary text-sm" onClick={()=>setPage("compte")}>Connexion</button>}
+            </div>
+          </div>
+        </header>
+
+        <main className="max-w-7xl mx-auto px-4 md:px-6 py-7">
+          {notice&&<div className="mb-5 p-3 rounded-xl border border-white/10 bg-[#191b27] flex justify-between gap-3"><span className="text-sm">{notice}</span><button onClick={()=>setNotice("")} aria-label="Fermer">✕</button></div>}
+          {loading&&<div className="py-16 text-center muted">Chargement de ton espace…</div>}
+
+          {!loading&&page==="accueil"&&<section>
+            <div className="hero-grid rounded-3xl p-7 md:p-14 border border-white/10 overflow-hidden">
+              <div className="max-w-3xl">
+                <span className="pill" style={{borderColor:settings.theme_color,color:"#ddd6fe"}}>WAKZIL STUDIO · POST-PRODUCTION</span>
+                <h1 className="text-4xl md:text-6xl font-black leading-tight mt-5">Des vidéos qui <span style={{color:settings.theme_color}}>captent</span> l’attention.</h1>
+                <p className="text-base md:text-lg muted mt-5 max-w-2xl">{settings.portfolio_description||"Du montage gaming aux formats courts, chaque vidéo est pensée pour raconter quelque chose."}</p>
+                <div className="flex flex-wrap gap-3 mt-8"><button className="btn btn-primary" onClick={()=>setPage("commande")}>Demander un montage ↗</button><button className="btn btn-quiet" onClick={()=>setPage("portfolio")}>Voir le portfolio</button></div>
+                <div className="grid grid-cols-3 gap-3 mt-10 max-w-xl"><div className="rounded-xl bg-black/20 p-3"><div className="text-xl md:text-2xl font-black">Sur mesure</div><div className="text-xs muted mt-1">Chaque projet</div></div><div className="rounded-xl bg-black/20 p-3"><div className="text-xl md:text-2xl font-black">Créatif</div><div className="text-xs muted mt-1">Style personnalisé</div></div><div className="rounded-xl bg-black/20 p-3"><div className="text-xl md:text-2xl font-black">Suivi</div><div className="text-xs muted mt-1">Via les tickets</div></div></div>
+              </div>
+            </div>
+            <div className="flex items-end justify-between mt-10 mb-4 gap-3"><div><h2 className="text-2xl font-black">Projets récents</h2><p className="muted text-sm mt-1">Quelques réalisations du studio.</p></div><button className="btn btn-quiet" onClick={()=>setPage("portfolio")}>Tout voir →</button></div>
+            {portfolio.length?<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">{portfolio.slice(0,3).map(item=><VideoCard key={item.id} item={item}/>)}</div>:<div className="glass rounded-2xl p-7 muted">Le portfolio sera affiché ici dès que des vidéos auront été ajoutées dans Supabase.</div>}
+          </section>}
+
+          {!loading&&page==="portfolio"&&<section><div className="mb-6"><h1 className="text-3xl font-black">Portfolio</h1><p className="muted mt-2">Les montages et projets du studio.</p></div>{portfolio.length?<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">{portfolio.map(item=><VideoCard key={item.id} item={item}/>)}</div>:<div className="glass rounded-2xl p-8 muted">Aucune vidéo pour le moment.</div>}</section>}
+
+          {!loading&&page==="commande"&&<section className="max-w-3xl mx-auto"><div className="mb-6"><h1 className="text-3xl font-black">Demander un montage</h1><p className="muted mt-2">Décris ton projet et, si tu le souhaites, choisis une date et une heure de rendez-vous vidéo.</p></div>
+            <form onSubmit={createOrder} className="glass rounded-2xl p-5 md:p-7 space-y-5">
+              {!session&&<div className="rounded-xl border border-violet-400/30 bg-violet-500/10 p-3 text-sm">Tu dois être connecté pour envoyer une demande. <button type="button" className="underline font-bold" onClick={()=>setPage("compte")}>Se connecter</button></div>}
+              <div><label className="text-sm font-semibold block mb-2">Nom du projet *</label><input className="field" required value={order.title} onChange={e=>setOrder({...order,title:e.target.value})} placeholder="Ex. Montage Rocket League"/></div>
+              <div className="grid sm:grid-cols-2 gap-4"><div><label className="text-sm font-semibold block mb-2">Contact (Discord, e-mail…)</label><input className="field" value={order.contact} onChange={e=>setOrder({...order,contact:e.target.value})} placeholder="Ton moyen de contact"/></div><div><label className="text-sm font-semibold block mb-2">Style souhaité</label><select className="field" value={order.style} onChange={e=>setOrder({...order,style:e.target.value})}><option value="">Choisir un style</option><option>Gaming dynamique</option><option>Cinématique</option><option>Short / TikTok / Reels</option><option>Montage classique</option><option>Autre (préciser dans le brief)</option></select></div></div>
+              <div><label className="text-sm font-semibold block mb-2">Lien des rushs / fichiers</label><input className="field" type="url" value={order.source_link} onChange={e=>setOrder({...order,source_link:e.target.value})} placeholder="https://…"/></div>
+              <div><label className="text-sm font-semibold block mb-2">Description du projet *</label><textarea className="field min-h-32" required value={order.brief} onChange={e=>setOrder({...order,brief:e.target.value})} placeholder="Durée, références, musique, effets, consignes…"/></div>
+              <label className="flex items-center gap-3 rounded-xl bg-black/20 p-4 cursor-pointer"><input type="checkbox" checked={order.rush} onChange={e=>setOrder({...order,rush:e.target.checked})}/><span><b>Montage prioritaire</b><span className="block text-sm muted">Supplément : {money(settings.rush_price)} · délai indicatif : {settings.rush_delivery_time||"à confirmer"}</span></span></label>
+              <div className="rounded-xl border border-white/10 p-4"><h3 className="font-bold mb-1">Planifier une vidéo (facultatif)</h3><p className="text-sm muted mb-4">La date et l’heure seront visibles dans le calendrier de l’équipe.</p><div className="grid sm:grid-cols-2 gap-4"><div><label className="text-sm block mb-2">Date</label><input className="field" type="date" min={isoDay(new Date())} value={order.scheduled_date} onChange={e=>setOrder({...order,scheduled_date:e.target.value})}/></div><div><label className="text-sm block mb-2">Heure</label><input className="field" type="time" value={order.scheduled_time} onChange={e=>setOrder({...order,scheduled_time:e.target.value})}/></div></div></div>
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5"><div><div className="muted text-sm">Estimation indicative</div><div className="text-2xl font-black">{money((Number(settings.base_price)||0)+(order.rush?(Number(settings.rush_price)||0):0))}</div></div><button className="btn btn-primary" disabled={busy} type="submit">{busy?"Envoi…":"Envoyer la demande →"}</button></div>
+            </form>
+          </section>}
+
+          {!loading&&page==="compte"&&<section className="max-w-md mx-auto"><div className="glass rounded-2xl p-6 md:p-8"><h1 className="text-3xl font-black">{authMode==="login"?"Content de te revoir":"Créer un compte"}</h1><p className="muted mt-2 mb-6">{authMode==="login"?"Connecte-toi pour suivre tes projets.":"Crée ton espace client pour commander un montage."}</p><form onSubmit={signIn} className="space-y-4">
+            {authMode==="signup"&&<div><label className="text-sm block mb-2">Nom / pseudo</label><input className="field" required value={authForm.name} onChange={e=>setAuthForm({...authForm,name:e.target.value})} placeholder="Ton pseudo"/></div>}
+            <div><label className="text-sm block mb-2">E-mail</label><input className="field" type="email" required value={authForm.email} onChange={e=>setAuthForm({...authForm,email:e.target.value})} placeholder="toi@exemple.fr"/></div>
+            <div><label className="text-sm block mb-2">Mot de passe</label><input className="field" type="password" minLength="6" required value={authForm.password} onChange={e=>setAuthForm({...authForm,password:e.target.value})} placeholder="6 caractères minimum"/></div>
+            <button className="btn btn-primary w-full" disabled={busy}>{busy?"Patiente…":authMode==="login"?"Se connecter":"Créer mon compte"}</button>
+          </form><p className="text-sm muted mt-5 text-center">{authMode==="login"?"Pas encore de compte ?":"Tu as déjà un compte ?"} <button className="underline text-white" onClick={()=>setAuthMode(authMode==="login"?"signup":"login")}>{authMode==="login"?"Créer un compte":"Se connecter"}</button></p></div></section>}
+
+          {!loading&&page==="tickets"&&<section><div className="flex flex-wrap justify-between items-end gap-3 mb-6"><div><h1 className="text-3xl font-black">{isTeam?"Tous les tickets":"Mes tickets"}</h1><p className="muted mt-2">Suis l’avancement de tes demandes et échange avec l’équipe.</p></div><button className="btn btn-primary" onClick={()=>setPage("commande")}>+ Nouvelle demande</button></div>
+            {visibleTickets.length?<div className="grid md:grid-cols-2 gap-4">{visibleTickets.map(t=><button key={t.id} onClick={()=>openTicket(t)} className="glass rounded-2xl p-5 text-left hover:border-violet-400/50 transition"><div className="flex justify-between gap-3 items-start"><div><div className="font-bold text-lg">{t.title}</div><div className="text-sm muted mt-1">{t.client_name||"Client"} · {niceDate(t.created_at)}</div></div><span className="pill">{t.status||"En attente"}</span></div><div className="flex justify-between mt-5"><span className="muted text-sm">Ticket #{String(t.public_code||t.id).slice(0,8)}</span><b>{money(t.price)}</b></div></button>)}</div>:<div className="glass rounded-2xl p-8 muted">Aucun ticket pour le moment.</div>}
+          </section>}
+
+          {!loading&&page==="ticket-detail"&&activeTicket&&<section className="max-w-4xl mx-auto"><button className="navlink mb-4" onClick={()=>setPage("tickets")}>← Retour aux tickets</button><div className="glass rounded-2xl overflow-hidden"><div className="p-5 md:p-6 border-b border-white/10 flex flex-wrap items-start justify-between gap-4"><div><span className="pill">{activeTicket.status||"En attente"}</span><h1 className="text-2xl font-black mt-3">{activeTicket.title}</h1><p className="muted text-sm mt-1">{activeTicket.client_name} · Ticket #{String(activeTicket.public_code||activeTicket.id).slice(0,8)}</p></div><div className="flex flex-wrap gap-2">{activeTicket.status!=="Fermé"&&settings.paypal_link&&<a className="btn btn-primary" href={settings.paypal_link} target="_blank" rel="noreferrer">Payer {money(activeTicket.price)}</a>}{isTeam&&<button className={`btn ${activeTicket.status==="Fermé"?"btn-primary":"btn-danger"}`} onClick={()=>updateTicketStatus(activeTicket,activeTicket.status==="Fermé"?"En cours":"Fermé")}>{activeTicket.status==="Fermé"?"↻ Réouvrir le ticket":"✓ Fermer le ticket"}</button>}</div></div>
+            <div className="p-5 md:p-6"><div className="grid sm:grid-cols-2 gap-3 mb-5"><div className="rounded-xl bg-black/20 p-3"><div className="text-xs muted">Budget estimé</div><div className="font-bold text-lg">{money(activeTicket.price)}</div></div><div className="rounded-xl bg-black/20 p-3"><div className="text-xs muted">Contact</div><div className="font-semibold break-words">{activeTicket.contact||"Non renseigné"}</div></div></div>{activeTicket.brief&&<div className="mb-6"><h3 className="font-bold mb-2">Brief du projet</h3><p className="muted whitespace-pre-wrap">{activeTicket.brief}</p></div>}{activeTicket.source_link&&<p className="mb-6"><a className="underline" href={activeTicket.source_link} target="_blank" rel="noreferrer">Ouvrir les fichiers du projet ↗</a></p>}
+              <h2 className="font-bold text-xl mb-4">Conversation</h2><div className="space-y-3 mb-5">{messages.length?messages.map(m=><div key={m.id} className={`rounded-xl p-3 ${m.sender_id===session?.user?.id?"bg-violet-500/15 ml-4":"bg-black/25 mr-4"}`}><div className="text-xs muted mb-1">{m.sender_id===session?.user?.id?"Toi":"Équipe"} · {niceDate(m.created_at)}</div><p className="whitespace-pre-wrap break-words">{m.text}</p></div>):<p className="muted text-sm">Pas encore de message.</p>}</div>
+              {activeTicket.status==="Fermé"?<div className="rounded-xl p-4 border border-amber-300/20 text-amber-100 bg-amber-500/10">Ce ticket est fermé. {isTeam?"Tu peux le réouvrir avec le bouton en haut.":"L’équipe doit le réouvrir pour continuer la conversation."}</div>:<form onSubmit={sendMessage} className="flex gap-2"><textarea className="field min-h-12" rows="2" value={messageText} onChange={e=>setMessageText(e.target.value)} placeholder="Écrire un message…" required/><button className="btn btn-primary self-end">Envoyer</button></form>}
+            </div></div></section>}
+
+          {!loading&&page==="calendrier"&&isTeam&&<section><div className="flex flex-wrap justify-between items-end gap-3 mb-6"><div><h1 className="text-3xl font-black">Calendrier de l’équipe</h1><p className="muted mt-2">Réservations et rendez-vous planifiés par les clients.</p></div><div className="flex gap-2"><button className="btn btn-quiet" onClick={()=>setMonth(new Date(month.getFullYear(),month.getMonth()-1,1))}>←</button><button className="btn btn-quiet" onClick={()=>setMonth(new Date())}>Aujourd’hui</button><button className="btn btn-quiet" onClick={()=>setMonth(new Date(month.getFullYear(),month.getMonth()+1,1))}>→</button></div></div>
+            <div className="glass rounded-2xl p-3 md:p-5"><h2 className="text-xl font-bold capitalize mb-4">{monthLabel}</h2><div className="grid grid-cols-7 gap-1.5 mb-2">{["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"].map(d=><div key={d} className="text-center muted text-xs font-bold py-2">{d}</div>)}</div><div className="grid grid-cols-7 gap-1.5">{calendarDays.map((d,i)=>{const dayBookings=bookings.filter(b=>b.scheduled_at&&isoDay(new Date(b.scheduled_at))===isoDay(d));return <div key={i} className={`calendar-cell ${d.getMonth()!==month.getMonth()?"other":""} ${isoDay(d)===isoDay(new Date())?"today":""}`}><div className="text-xs font-bold mb-1">{d.getDate()}</div><div className="space-y-1">{dayBookings.map(b=><div key={b.id} title={`${b.title} — ${b.client_name} — ${niceDate(b.scheduled_at)}`} className="rounded-md px-1 py-1 text-[10px] leading-tight break-words" style={{background:settings.theme_color}}>{new Date(b.scheduled_at).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})} {b.title}</div>)}</div></div>})}</div></div>
+            <div className="mt-6"><h2 className="text-xl font-bold mb-3">Prochains rendez-vous</h2>{bookings.filter(b=>new Date(b.scheduled_at)>=new Date()).slice(0,10).length?<div className="space-y-2">{bookings.filter(b=>new Date(b.scheduled_at)>=new Date()).slice(0,10).map(b=><div key={b.id} className="glass rounded-xl p-4 flex flex-wrap justify-between gap-3"><div><b>{b.title}</b><div className="text-sm muted">{b.client_name} · {b.status||"À planifier"}</div>{b.notes&&<div className="text-sm muted mt-1 line-clamp-3">{b.notes}</div>}</div><div className="font-semibold">{niceDate(b.scheduled_at)}</div></div>)}</div>:<div className="glass rounded-xl p-5 muted">Aucun rendez-vous à venir.</div>}</div>
+          </section>}
+
+          {!loading&&page==="admin"&&isAdmin&&<section className="max-w-4xl mx-auto"><div className="mb-6"><h1 className="text-3xl font-black">Administration</h1><p className="muted mt-2">Gère l’apparence, les tarifs et le portfolio.</p></div>
+            <form onSubmit={saveSettings} className="glass rounded-2xl p-5 md:p-6 mb-6"><h2 className="text-xl font-bold mb-4">Paramètres du site</h2><div className="grid sm:grid-cols-2 gap-4">
+              <div><label className="text-sm block mb-2">Couleur principale</label><div className="flex gap-2"><input type="color" className="h-11 w-14 rounded-lg bg-transparent" value={settingsForm?.theme_color||settings.theme_color} onChange={e=>setSettingsForm({...settingsForm,theme_color:e.target.value})}/><input className="field" value={settingsForm?.theme_color||settings.theme_color} onChange={e=>setSettingsForm({...settingsForm,theme_color:e.target.value})}/></div></div>
+              <div><label className="text-sm block mb-2">Lien de paiement PayPal</label><input className="field" type="url" value={settingsForm?.paypal_link||""} onChange={e=>setSettingsForm({...settingsForm,paypal_link:e.target.value})} placeholder="https://paypal.me/…"/></div>
+              <div><label className="text-sm block mb-2">Tarif de base (€)</label><input className="field" type="number" min="0" value={settingsForm?.base_price??""} onChange={e=>setSettingsForm({...settingsForm,base_price:Number(e.target.value)})}/></div>
+              <div><label className="text-sm block mb-2">Supplément prioritaire (€)</label><input className="field" type="number" min="0" value={settingsForm?.rush_price??""} onChange={e=>setSettingsForm({...settingsForm,rush_price:Number(e.target.value)})}/></div>
+              <div><label className="text-sm block mb-2">Tarif miniature (€)</label><input className="field" type="number" min="0" value={settingsForm?.minia_price??""} onChange={e=>setSettingsForm({...settingsForm,minia_price:Number(e.target.value)})}/></div>
+              <div><label className="text-sm block mb-2">Tarif sous-titres (€)</label><input className="field" type="number" min="0" value={settingsForm?.sous_titres_price??""} onChange={e=>setSettingsForm({...settingsForm,sous_titres_price:Number(e.target.value)})}/></div>
+              <div><label className="text-sm block mb-2">Délai prioritaire</label><input className="field" value={settingsForm?.rush_delivery_time||""} onChange={e=>setSettingsForm({...settingsForm,rush_delivery_time:e.target.value})} placeholder="48 heures"/></div>
+            </div><div className="mt-4"><label className="text-sm block mb-2">Description du portfolio</label><textarea className="field min-h-24" value={settingsForm?.portfolio_description||""} onChange={e=>setSettingsForm({...settingsForm,portfolio_description:e.target.value})}/></div><button className="btn btn-primary mt-5" disabled={busy}>Enregistrer les paramètres</button></form>
+            <form onSubmit={addPortfolio} className="glass rounded-2xl p-5 md:p-6"><h2 className="text-xl font-bold mb-4">Ajouter une vidéo au portfolio</h2><div className="grid sm:grid-cols-2 gap-4"><div><label className="text-sm block mb-2">Titre *</label><input className="field" required value={newVideo.title} onChange={e=>setNewVideo({...newVideo,title:e.target.value})}/></div><div><label className="text-sm block mb-2">Catégorie</label><select className="field" value={newVideo.category} onChange={e=>setNewVideo({...newVideo,category:e.target.value})}><option>Gaming</option><option>Shorts</option><option>Montage vidéo</option><option>Miniature</option><option>Autre</option></select></div><div className="sm:col-span-2"><label className="text-sm block mb-2">Lien vidéo (YouTube ou autre) *</label><input className="field" required type="url" value={newVideo.video_url} onChange={e=>setNewVideo({...newVideo,video_url:e.target.value})} placeholder="https://…"/></div><div><label className="text-sm block mb-2">URL de miniature (facultatif)</label><input className="field" type="url" value={newVideo.thumbnail_url} onChange={e=>setNewVideo({...newVideo,thumbnail_url:e.target.value})}/></div><div><label className="text-sm block mb-2">Prix de départ (€)</label><input className="field" type="number" min="0" value={newVideo.price_base} onChange={e=>setNewVideo({...newVideo,price_base:e.target.value})}/></div></div><button className="btn btn-primary mt-5" disabled={busy}>Ajouter au portfolio</button><p className="text-xs muted mt-3">Si la table portfolio n’a pas de colonne thumbnail_url, laisse ce champ vide. Les colonnes existantes title, category, video_url et price_base sont utilisées.</p></form>
+          </section>}
+
+          {!loading&&page==="admin"&&!isAdmin&&<div className="glass rounded-2xl p-8 text-center"><h2 className="text-xl font-bold">Accès réservé</h2><p className="muted mt-2">Cette page est disponible uniquement pour les administrateurs.</p></div>}
+          {!loading&&page==="calendrier"&&!isTeam&&<div className="glass rounded-2xl p-8 text-center"><h2 className="text-xl font-bold">Calendrier réservé à l’équipe</h2><p className="muted mt-2">Connecte-toi avec un compte admin ou monteur.</p></div>}
+        </main>
+        <footer className="border-t border-white/10 mt-14"><div className="max-w-7xl mx-auto px-4 md:px-6 py-7 flex flex-wrap justify-between gap-3 muted text-sm"><span>© {new Date().getFullYear()} Wakzil Studio</span><span>Montage vidéo · Créativité · Passion</span></div></footer>
+      </div>;
+    }
+
+    const root=ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App/>);
+  </script>
+</body>
+</html>
